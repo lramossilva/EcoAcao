@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}EcoAção | Minhas ações{% endblock %}
+
+{% block content %}
+  <section class="intro">
+    <p class="eyebrow">SEU IMPACTO COMEÇA AQUI</p>
+    <h1>Cuide do planeta no seu dia a dia.</h1>
+    <p>Cadastre atitudes sustentáveis e acompanhe cada passo que você concluir.</p>
+  </section>
+
+  <section class="dashboard" aria-label="Resumo do seu progresso">
+    <article class="stat-card">
+      <span class="stat-number">{{ total }}</span>
+      <span class="stat-label">ações cadastradas</span>
+    </article>
+    <article class="stat-card">
+      <span class="stat-number">{{ completed }}</span>
+      <span class="stat-label">ações concluídas</span>
+    </article>
+    <article class="stat-card progress-card">
+      <div class="progress-heading">
+        <span class="stat-label">progresso</span>
+        <span class="progress-value">{{ progress }}%</span>
+      </div>
+      <progress value="{{ progress }}" max="100" aria-label="Progresso das ações">
+        {{ progress }}%
+      </progress>
+    </article>
+  </section>
+
+  <section class="content-grid">
+    <form class="action-form" action="{{ url_for('actions.create_action') }}" method="post">
+      <h2>Nova ação</h2>
+      <label for="title">O que você vai fazer?</label>
+      <input id="title" name="title" type="text" maxlength="80" required
+             placeholder="Ex.: Separar o lixo reciclável">
+
+      <label for="description">Detalhes <span>(opcional)</span></label>
+      <textarea id="description" name="description" maxlength="240" rows="3"
+                placeholder="Adicione uma nota ou combine um dia"></textarea>
+
+      <button class="button button-primary" type="submit">Cadastrar ação</button>
+    </form>
+
+    <section class="action-list" aria-labelledby="list-title">
+      <div class="section-heading">
+        <h2 id="list-title">Minhas ações</h2>
+        <span class="list-count">{{ total }}</span>
+      </div>
+
+      {% if actions %}
+        <ul>
+          {% for action in actions %}
+            <li class="action-item{% if action.completed %} is-complete{% endif %}">
+              <div class="action-copy">
+                <h3>{{ action.title }}</h3>
+                {% if action.description %}
+                  <p>{{ action.description }}</p>
+                {% endif %}
+                {% if action.completed %}
+                  <span class="status">Concluída</span>
+                {% endif %}
+              </div>
+              {% if not action.completed %}
+                <form action="{{ url_for('actions.complete_action', action_id=action.id) }}"
+                      method="post">
+                  <button class="button button-secondary" type="submit">
+                    Concluir
+                  </button>
+                </form>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="empty-state">
+          <span aria-hidden="true">🌱</span>
+          <p>Suas ações aparecem aqui.</p>
+          <p>Que tal começar com uma atitude simples hoje?</p>
+        </div>
+      {% endif %}
+    </section>
+  </section>
+{% endblock %}
